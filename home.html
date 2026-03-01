@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>University-time App - ホーム</title>
+  <link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div class="welcome">
+    <h1 style="margin:0;">University-time App</h1>
+    <p>こんにちは、<span id="display-name">ゲストユーザー</span>さん</p>
+  </div>
+
+  <div class="home-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 15px;">
+
+   <div id="next-panel" class="next-panel hidden" style="background: linear-gradient(110deg, #4facfe 0%, #ff4b2b 100%);">
+      
+<small id="next-label">🕒 次の講義</small>
+      <div id="next-info" style="font-size: 1.1rem; font-weight: bold; margin-top: 5px;"></div>
+      <div id="countdown-timer" style="font-size: 0.85rem; opacity: 0.9; margin-top: 3px;"></div>
+    </div>
+
+    <div id="task-summary-panel" class="task-summary-panel hidden" style="white-space: pre-wrap;">
+      <small>📚 直近の課題</small>
+      <div id="task-summary-content" style="font-weight: bold; margin-top: 5px; font-size: 0.9rem;"></div>
+    </div>
+
+    <a href="jikannwari.html" class="menu-card"><h2>📅</h2><p>時間割</p></a>
+    <a href="#" class="menu-card" id="settings-btn"><h2>⚙️</h2><p>設定</p></a>
+    <a href="#" class="menu-card" id="home-task-btn" style="grid-column: span 2;"><h2>📚</h2><p>課題メモを編集</p></a>
+  </div>
+
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2 style="margin-top:0;">⚙️ アプリ設定</h2>
+      <div style="text-align:left; font-size:0.85rem;">
+        <label>ユーザー名:</label>
+        <input type="text" id="name-in" style="width:100%; margin-bottom:10px; padding:8px; border:1px solid #ccc; border-radius:5px;">
+        
+        <label style="display:flex; justify-content:space-between; margin-bottom:8px;">🌙 ダークモードを有効にする: <input type="checkbox" id="dark-sw"></label>
+        <hr>
+        <label style="display:flex; justify-content:space-between; margin-bottom:8px;">🔔 アプリ内通知バッジ: <input type="checkbox" id="notif-sw"></label>
+        <label style="display:flex; justify-content:space-between; margin-bottom:8px;">💬 ポップアップ通知を表示: <input type="checkbox" id="popup-sw"></label>
+        <label style="display:flex; justify-content:space-between; margin-bottom:8px; color:#007bff; font-weight:bold;">📱 システム通知(ロック画面): <input type="checkbox" id="system-notif-sw"></label>
+        
+        <label style="display:flex; justify-content:space-between; margin-bottom:8px;">🔴 進行中の授業を強調: <input type="checkbox" id="high-sw"></label>
+        <label style="display:flex; justify-content:space-between; margin-bottom:8px;">📌 ホームに次の授業を表示: <input type="checkbox" id="next-sw"></label>
+        <label style="display:flex; justify-content:space-between; margin-bottom:8px;">⏳ 終了までの秒読みを表示: <input type="checkbox" id="count-sw"></label>
+        <label style="display:flex; justify-content:space-between; margin-bottom:8px;">📝 課題メモをホームに表示: <input type="checkbox" id="task-home-sw"></label>
+        <label style="display:flex; justify-content:space-between; margin-bottom:8px;">🚀 進行中の授業へ自動移動: <input type="checkbox" id="scroll-sw"></label>
+        <label style="display:flex; justify-content:space-between; margin-bottom:8px;">📅 設定保存後に今日の日付に戻る: <input type="checkbox" id="auto-return-sw"></label>
+        <label style="display:flex; justify-content:space-between; margin-bottom:15px; color: #ff4757; font-weight: bold;">♻️ 翌日に時間割データを自動削除: <input type="checkbox" id="auto-del-sw"></label>
+
+        <hr>
+        <p style="font-weight:bold; margin:10px 0;">📅 スケジュール編集</p>
+        <input type="date" id="edit-date" style="width:100%; padding:8px; margin-bottom:5px;">
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px; margin-bottom:10px;">
+          <button id="copy-day" class="copy-btn">コピー</button>
+          <button id="paste-day" class="copy-btn">貼り付け</button>
+          <button id="clear-day" class="copy-btn" style="background:#ff4757;">一括削除</button>
+        </div>
+
+        <label>📢 この日の行事・通告:</label>
+        <input type="text" id="day-event" style="width:100%; margin-bottom:10px; padding:8px;" placeholder="例：レポート締切など">
+
+        <div style="max-height:180px; overflow-y:auto; border:1px solid #eee; padding:5px;">
+          <table class="edit-table">
+            <thead><tr style="font-size:0.6rem;"><th>開始</th><th>終了</th><th>講義名</th><th>場所</th></tr></thead>
+            <tbody id="edit-list"></tbody>
+          </table>
+        </div>
+      </div>
+      <button id="save-settings" class="action-btn">設定を保存</button>
+      <button id="close-settings" style="width:100%; background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">閉じる</button>
+      
+      <div style="margin-top: 30px; text-align: center;">
+        <button id="reset-settings" style="background:none; border:none; color:#bbb; text-decoration:underline; font-size:0.7rem; cursor:pointer;">
+          アプリの全データを初期化する
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="home-task-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2 style="margin-top:0;">📚 課題メモ編集</h2>
+      <textarea id="home-task-memo" style="width:100%; padding:10px; border-radius:10px; height:200px; box-sizing:border-box; font-family:inherit;" placeholder="提出期限などをメモ..."></textarea>
+      <button id="save-home-task" class="action-btn">保存して同期</button>
+      <button id="close-home-task" style="width:100%; background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">キャンセル</button>
+    </div>
+  </div>
+
+  <script>
+  
+  // スケジュール編集のデフォルトで入っている時間
+
+    const DEFAULT_TIMES = [{s:"09:00",e:"10:30"},{s:"10:40",e:"12:10"},{s:"13:00",e:"14:30"},{s:"14:40",e:"16:10"},{s:"16:20",e:"17:50"},{s:":",e:":"}];
+    let clipboard = null;
+
+    function applyTheme() {
+      const isDark = localStorage.getItem('theme') === 'dark';
+      document.body.classList.toggle('dark-mode', isDark);
+    }
+
+    function checkAutoDelete() {
+      if (localStorage.getItem('autoDelEnabled') !== 'true') return;
+      const lastDate = localStorage.getItem('lastAccessDate');
+      const today = new Date().toLocaleDateString();
+      if (lastDate && lastDate !== today) {
+        console.log("New day detected.");
+      }
+      localStorage.setItem('lastAccessDate', today);
+    }
+
+    function load() {
+      applyTheme();
+      checkAutoDelete();
+      
+      const name = localStorage.getItem('userName') || 'ゲストユーザー';
+      document.getElementById('display-name').innerText = name;
+      document.getElementById('name-in').value = name;
+      
+      document.getElementById('dark-sw').checked = localStorage.getItem('theme') === 'dark';
+      document.getElementById('notif-sw').checked = localStorage.getItem('notifEnabled') !== 'false';
+      document.getElementById('popup-sw').checked = localStorage.getItem('popupEnabled') === 'true';
+      document.getElementById('system-notif-sw').checked = localStorage.getItem('systemNotifEnabled') === 'true'; // 追加
+      document.getElementById('high-sw').checked = localStorage.getItem('highlightEnabled') !== 'false';
+      document.getElementById('next-sw').checked = localStorage.getItem('nextEnabled') !== 'false';
+      document.getElementById('count-sw').checked = localStorage.getItem('countEnabled') === 'true';
+      document.getElementById('task-home-sw').checked = localStorage.getItem('taskHomeEnabled') === 'true';
+      document.getElementById('scroll-sw').checked = localStorage.getItem('scrollEnabled') === 'true';
+      document.getElementById('auto-return-sw').checked = localStorage.getItem('autoReturnEnabled') === 'true';
+      document.getElementById('auto-del-sw').checked = localStorage.getItem('autoDelEnabled') === 'true';
+      
+      if(localStorage.getItem('nextEnabled') !== 'false') {
+        document.getElementById('next-panel').classList.remove('hidden');
+        updateNextPanel();
+        setInterval(updateNextPanel, 1000); // 1秒更新に変更して精度向上
+      }
+      
+      if(localStorage.getItem('taskHomeEnabled') === 'true') updateTaskSummary();
+
+      document.getElementById('edit-date').value = new Date().toLocaleDateString('sv-SE');
+      renderEditList();
+    }
+
+    function renderEditList() {
+      const day = new Date(document.getElementById('edit-date').value).getDay();
+      const data = JSON.parse(localStorage.getItem(`schedule_${day}`) || "[]");
+      document.getElementById('day-event').value = localStorage.getItem(`event_${day}`) || "";
+      const list = document.getElementById('edit-list');
+      list.innerHTML = '';
+      for(let i=0; i<6; i++) {
+        const item = data[i] || {time:DEFAULT_TIMES[i].s, end:DEFAULT_TIMES[i].e, title:"", room:""};
+        list.innerHTML += `<tr>
+          <td><input type="time" value="${item.time}"></td>
+          <td><input type="time" value="${item.end}"></td>
+          <td><input type="text" value="${item.title}" placeholder="${i+1}限名"></td>
+          <td><input type="text" value="${item.room}" placeholder="教室"></td>
+        </tr>`;
+      }
+    }
+
+   function updateNextPanel() {
+  const day = new Date().getDay();
+  const data = JSON.parse(localStorage.getItem(`schedule_${day}`) || "[]");
+  const now = new Date();
+  const current = now.getHours() * 60 + now.getMinutes();
+  
+  const nextPanelLabel = document.getElementById('next-label');
+  const nextPanelInfo = document.getElementById('next-info');
+  const countdownTimer = document.getElementById('countdown-timer');
+
+  // 1. 進行中の講義を探す
+  let currentClass = data.find(item => {
+    if(!item.time || !item.end || item.title === "") return false;
+    const [sh, sm] = item.time.split(':').map(Number);
+    const [eh, em] = item.end.split(':').map(Number);
+    return current >= (sh * 60 + sm) && current < (eh * 60 + em);
+  });
+
+  if(currentClass && localStorage.getItem('countEnabled') === 'true') {
+    // 進行中の講義がある場合
+    nextPanelLabel.innerText = "📖 進行中の講義";
+    const roomInfo = currentClass.room ? ` (${currentClass.room})` : "";
+    nextPanelInfo.innerText = `${currentClass.title}${roomInfo}`;
+    
+    const [eh, em] = currentClass.end.split(':').map(Number);
+    const remain = (eh * 60 + em) - current;
+    countdownTimer.innerText = `終了まであと ${remain} 分`;
+  } else {
+    // 進行中がない場合、次に予定されている講義を探す
+    const next = data.find(item => {
+      if(!item.time || item.title === "") return false;
+      const [h, m] = item.time.split(':').map(Number);
+      return (h * 60 + m) > current;
+    });
+
+    if (next) {
+      // 次の講義がある
+      nextPanelLabel.innerText = "🕒 次の講義";
+      nextPanelInfo.innerText = `${next.time}〜 ${next.title}`;
+      countdownTimer.innerText = "";
+    } else {
+      // 全ての予定が終わった、または予定がない
+      nextPanelLabel.innerText = "🕒 次の講義";
+      nextPanelInfo.innerText = "本日の講義は終了しました";
+      countdownTimer.innerText = "";
+    }
+  }
+}
+ 
+    function updateTaskSummary() {
+      const taskStr = localStorage.getItem('taskMemo');
+      if(!taskStr || taskStr.trim() === "") {
+        document.getElementById('task-summary-panel').classList.add('hidden');
+        return;
+      }
+      document.getElementById('task-summary-panel').classList.remove('hidden');
+      document.getElementById('task-summary-content').innerText = taskStr;
+    }
+
+    // --- イベントリスナー ---
+    document.getElementById('settings-btn').onclick = () => {
+      document.getElementById('dark-sw').checked = localStorage.getItem('theme') === 'dark';
+      document.getElementById('settings-modal').classList.remove('hidden');
+    };
+    document.getElementById('close-settings').onclick = () => {
+      document.getElementById('settings-modal').classList.add('hidden');
+    };
+
+    // システム通知の許可リクエスト
+    document.getElementById('system-notif-sw').onchange = (e) => {
+      if(e.target.checked) {
+        if(Notification.permission !== "granted") {
+          Notification.requestPermission().then(permission => {
+            if(permission !== "granted") {
+              alert("通知がブロックされています。ブラウザの設定から許可してください。");
+              e.target.checked = false;
+            }
+          });
+        }
+      }
+    };
+
+    // 課題編集（ホーム画面用）
+    document.getElementById('home-task-btn').onclick = () => {
+      document.getElementById('home-task-memo').value = localStorage.getItem('taskMemo') || "";
+      document.getElementById('home-task-modal').classList.remove('hidden');
+    };
+    document.getElementById('save-home-task').onclick = () => {
+      localStorage.setItem('taskMemo', document.getElementById('home-task-memo').value);
+      updateTaskSummary();
+      document.getElementById('home-task-modal').classList.add('hidden');
+      setTimeout(() => alert("課題を保存・同期しました"), 100);
+    };
+    document.getElementById('close-home-task').onclick = () => {
+      document.getElementById('home-task-modal').classList.add('hidden');
+    };
+
+    // 設定保存
+    document.getElementById('save-settings').onclick = () => {
+      localStorage.setItem('userName', document.getElementById('name-in').value);
+      localStorage.setItem('theme', document.getElementById('dark-sw').checked ? 'dark' : 'light');
+      localStorage.setItem('notifEnabled', document.getElementById('notif-sw').checked);
+      localStorage.setItem('popupEnabled', document.getElementById('popup-sw').checked);
+      localStorage.setItem('systemNotifEnabled', document.getElementById('system-notif-sw').checked); // 追加
+      localStorage.setItem('highlightEnabled', document.getElementById('high-sw').checked);
+      localStorage.setItem('nextEnabled', document.getElementById('next-sw').checked);
+      localStorage.setItem('countEnabled', document.getElementById('count-sw').checked);
+      localStorage.setItem('taskHomeEnabled', document.getElementById('task-home-sw').checked);
+      localStorage.setItem('scrollEnabled', document.getElementById('scroll-sw').checked);
+      localStorage.setItem('autoReturnEnabled', document.getElementById('auto-return-sw').checked);
+      localStorage.setItem('autoDelEnabled', document.getElementById('auto-del-sw').checked);
+      
+      const day = new Date(document.getElementById('edit-date').value).getDay();
+      localStorage.setItem(`event_${day}`, document.getElementById('day-event').value);
+      const rows = document.querySelectorAll('#edit-list tr');
+      const newData = Array.from(rows).map(row => {
+        const ins = row.querySelectorAll('input');
+        return { time: ins[0].value, end: ins[1].value, title: ins[2].value, room: ins[3].value };
+      });
+      localStorage.setItem(`schedule_${day}`, JSON.stringify(newData));
+      
+      alert('設定を保存しました');
+      location.reload();
+    };
+
+    document.getElementById('copy-day').onclick = () => {
+      const rows = document.querySelectorAll('#edit-list tr');
+      clipboard = Array.from(rows).map(row => {
+        const ins = row.querySelectorAll('input');
+        return { time: ins[0].value, end: ins[1].value, title: ins[2].value, room: ins[3].value };
+      });
+      alert('スケジュールをコピーしました');
+    };
+
+    document.getElementById('paste-day').onclick = () => {
+      if (!clipboard) return alert('先にコピーしてください');
+      const rows = document.querySelectorAll('#edit-list tr');
+      clipboard.forEach((data, i) => {
+        const ins = rows[i].querySelectorAll('input');
+        ins[0].value = data.time;
+        ins[1].value = data.end;
+        ins[2].value = data.title;
+        ins[3].value = data.room;
+      });
+      alert('スケジュールを貼り付けました');
+    };
+
+    document.getElementById('clear-day').onclick = () => {
+      if (!confirm('この日の入力をすべて消去しますか？')) return;
+      const rows = document.querySelectorAll('#edit-list tr');
+      rows.forEach((row, i) => {
+        const ins = row.querySelectorAll('input');
+        ins[0].value = DEFAULT_TIMES[i].s;
+        ins[1].value = DEFAULT_TIMES[i].e;
+        ins[2].value = '';
+        ins[3].value = '';
+      });
+    };
+
+    document.getElementById('reset-settings').onclick = () => {
+      if(confirm('【警告】すべてのスケジュールと課題メモが消去されます。本当によろしいですか？')) {
+        if(confirm('本当に、本当によろしいですか？この操作は取り消せません。')) {
+          localStorage.clear();
+          location.reload();
+        }
+      }
+    };
+
+    document.getElementById('edit-date').onchange = renderEditList;
+
+    // モーダルの余白クリックで閉じる
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.onclick = (e) => {
+        if (e.target === modal) {
+          modal.classList.add('hidden');
+        }
+      };
+    });
+
+    window.onload = load;
+
+    // --- scriptの最後の方 ---
+
+    // --- PWA Service Workerの登録コード ---
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log("Service Worker Registered"))
+        .catch(err => console.log("SW Register Error:", err));
+    }
+  </script>
+</body>
+</html>

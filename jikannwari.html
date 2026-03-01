@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My時間割</title>
+  <link rel="stylesheet" href="style.css">
+<link rel="manifest" href="manifest.json">
+</head>
+<body>
+ 
+<header>
+  <button onclick="location.href='home.html'" style="background:rgba(255,255,255,0.2); border:1px solid white; color:white; padding:5px 10px; border-radius:10px; cursor:pointer;">🏠 戻る</button>
+  <div id="digital-clock">00:00:00</div>
+  <button id="theme-toggle-idx" style="background:none; border:none; color:white; font-size:1.5rem; cursor:pointer; width:40px;">🌙</button>
+</header>
+
+  <main>
+    <div style="padding:10px 20px; text-align:right;">
+      <input type="date" id="date-select" style="padding:8px; border-radius:10px; border:1px solid #ccc;">
+    </div>
+    <div id="event-display" class="event-info-box hidden"></div>
+    <div id="timeline"></div>
+  </main>
+
+  <div id="bottom-bar">
+    <div class="bar-content">
+      <button class="nav-btn" id="edit-today-btn">✏️<br>時間割変更</button>
+      <button class="nav-btn" id="task-btn">📚<br>課題メモ</button>
+      <button class="nav-btn" id="notif-btn">🔔<br>通知<span id="notification-badge" class="badge"></span></button>
+    </div>
+  </div>
+
+  <div id="task-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2 style="margin-top:0;">📚 課題メモ</h2>
+      <textarea id="task-memo" style="width:100%; padding:10px; border-radius:10px; height:150px; box-sizing:border-box;" placeholder="提出期限などをメモ..."></textarea>
+      <button id="save-task" class="action-btn">保存して閉じる</button>
+      <button id="cancel-task" style="width:100%; background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">キャンセル</button>
+    </div>
+  </div>
+
+  <div id="notif-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2 style="margin-top:0;">🔔 通知</h2>
+      <p style="text-align:left; font-size:0.9rem;">・通知はありません<br></p>
+      <button id="close-notif" class="action-btn">確認</button>
+    </div>
+  </div>
+
+  <div id="edit-today-modal" class="modal hidden">
+    <div class="modal-content" style="max-width: 500px;">
+      <h2 style="margin-top:0;">✏️ 選択中の日の編集</h2>
+      
+      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px; margin-bottom:10px;">
+        <button id="modal-copy-day" class="copy-btn">コピー</button>
+        <button id="modal-paste-day" class="copy-btn">貼り付け</button>
+        <button id="modal-clear-day" class="copy-btn" style="background:#ff4757;">一括削除</button>
+      </div>
+
+      <div style="max-height: 400px; overflow-y: auto;">
+        <table style="width:100%;" id="today-edit-table">
+          </table>
+      </div>
+      <button id="save-today-edit" class="action-btn">変更を保存</button>
+      <button id="close-today-edit" style="width:100%; background:none; border:none; color:#888; margin-top:10px; cursor:pointer;">キャンセル</button>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

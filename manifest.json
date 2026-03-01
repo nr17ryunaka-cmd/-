@@ -1,0 +1,21 @@
+{
+  "short_name": "UniTime",
+  "name": "University-time App",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/home.html",
+  "background_color": "#007bff",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#007bff"
+}
